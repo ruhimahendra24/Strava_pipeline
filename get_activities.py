@@ -2,9 +2,11 @@ import pandas as pd
 import requests
 import json
 import time
-## Get the tokens from file to connect to Strava
+
+# OPEN RESPONSE FILE
 with open('strava_tokens.json') as json_file:
     strava_tokens = json.load(json_file)
+    
 ## If access_token has expired then use the refresh_token to get the new access_token
 if strava_tokens['expires_at'] < time.time():
 #Make Strava auth API call with current refresh token
