@@ -30,7 +30,7 @@ def strava_summary():
             'elapsed_time' TEXT,
             'total_elevation_gain' TEXT,
            'end_latlng' TEXT,
-            'external_id' TEXT,
+            'external_id' TEXT
         );
         """,
         sqlite_conn_id="activities"
