@@ -98,6 +98,15 @@ def strava_summary():
         strava_activies = get_activities()
                     
         create_database.set_downstream(strava_activies)
+        
+        @task()
+        ## CLEAN DATA 
+        def clean_activities(activties): 
+            activties = json.loads(activties)
+            clean_dict = [x for x in activties if (x['type'] == 'Run')]
+            clean_json = json.dumps(clean_dict)
+            return clean_json
+        cleaned_activities = clean_activities(strava_activies)
     
     
         @task()
@@ -113,7 +122,7 @@ def strava_summary():
             hook.insert_rows(table='runs', rows=new_activties, target_fields=["id", "name", "start_date_local", "type", "distance", "moving_time", "elapsed_time", "total_elevation_gain", "end_latlng", "external_id"])
             return new_activties
 
-        new_activties = load_activities(strava_activies)
+        new_activties = load_activities(cleaned_activities)
         
     
 summary = strava_summary()
