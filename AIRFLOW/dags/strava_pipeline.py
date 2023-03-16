@@ -1,24 +1,24 @@
-#%% 
 import os
 import json
 import requests
 import pandas as pd
 import time 
-
 import pendulum
 from airflow.decorators import dag, task
 from airflow.providers.sqlite.operators.sqlite import SqliteOperator
 from airflow.providers.sqlite.hooks.sqlite import SqliteHook
 
 
-
+## DEFINE DAG
 @dag(dag_id = 'strava_activities',
-     schedule_interval = '@hourly',
+     schedule_interval = '@daily',
      start_date = pendulum.datetime(2023,3,7),
      catchup = False
 )
+
+
 def strava_summary(): 
-    
+    ## CREATE EMPTY DB
         create_database = SqliteOperator(
             task_id = "create_table_sqlite",
              sql=r"""
@@ -39,6 +39,7 @@ def strava_summary():
     )
 
         @task()
+        ## GET STRAVA ACTIVITIES FROM API
         def get_activities():
         
             with open('/Users/ruhimahendra/airflow/dags/strava_creds.json') as creds:
@@ -48,8 +49,6 @@ def strava_summary():
                             url = 'https://www.strava.com/oauth/token',
                             data = strava_creds
                         )
-           
-            #Save response as json in new variable
             strava_tokens = response.json()
     
             #Loop through all activities
@@ -57,6 +56,7 @@ def strava_summary():
             url = "https://www.strava.com/api/v3/activities"
             print(strava_tokens)
             access_token = strava_tokens['access_token']
+            
             ## Create the dataframe ready for the API call to store your activity data
             activities = pd.DataFrame(
                 columns = [
@@ -73,7 +73,6 @@ def strava_summary():
                 ]
             )
             while True:
-                
                 # get page of activities from Strava
                 r = requests.get(url + '?access_token=' + access_token + '&per_page=200' + '&page=' + str(page))
                 r = r.json()
@@ -102,6 +101,7 @@ def strava_summary():
     
     
         @task()
+        ## LOAD ACTIVITIES TO DB
         def load_activities(activties):
             hook = SqliteHook(sqlite_conn_id="activities")
             stored_activties = hook.get_pandas_df("SELECT * from runs;")
