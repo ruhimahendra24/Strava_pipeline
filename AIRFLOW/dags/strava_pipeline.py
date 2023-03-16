@@ -10,7 +10,8 @@ from airflow.decorators import dag, task
 from airflow.providers.sqlite.operators.sqlite import SqliteOperator
 from airflow.providers.sqlite.hooks.sqlite import SqliteHook
 
-#%%
+
+
 @dag(dag_id = 'strava_activities',
      schedule_interval = '@hourly',
      start_date = pendulum.datetime(2023,3,7),
@@ -39,28 +40,22 @@ def strava_summary():
 
         @task()
         def get_activities():
-        # OPEN RESPONSE FILE
-            strava_tokens = {"token_type": "Bearer", "expires_at": 1677391330, "expires_in": 21600, "refresh_token": "223a205b1cdb8d651d32eda3b895dcac0a52035b", "access_token": "effd4c5a975d45116d97ae22adf0120ce8714e8a", "athlete": {"id": 57262801, "username": "ruhi_mahendra", "resource_state": 2, "firstname": "Ruhi", "lastname": "Mahendra", "bio": "", "city": "Montreal", "state": "Quebec", "country": "Canada", "sex": "F", "premium": True, "summit": True, "created_at": "2020-05-05T22:34:09Z", "updated_at": "2023-01-22T18:54:31Z", "badge_type_id": 1, "weight": 49.8, "profile_medium": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/57262801/21042381/12/medium.jpg", "profile": "https://dgalywyr863hv.cloudfront.net/pictures/athletes/57262801/21042381/12/large.jpg", "friend": None, "follower": None}}
-            ## If access_token has expired then use the refresh_token to get the new access_token
-            if strava_tokens['expires_at'] < time.time():
-            #Make Strava auth API call with current refresh token
-                response = requests.post(
-                                    url = 'https://www.strava.com/oauth/token',
-                                    data = {
-                                            'client_id': 79117,
-                                            'client_secret': '96a73b79661036fa04c67697846e22d40789b21a',
-                                            'grant_type': 'refresh_token',
-                                            'refresh_token': strava_tokens['refresh_token']
-                                            }
-                                )
+        
+            with open('/Users/ruhimahendra/airflow/dags/strava_creds.json') as creds:
+                strava_creds = json.load(creds)
+                     
+            response = requests.post(
+                            url = 'https://www.strava.com/oauth/token',
+                            data = strava_creds
+                        )
+           
             #Save response as json in new variable
-                new_strava_tokens = response.json()
+            strava_tokens = response.json()
     
-            #Use new Strava tokens from now
-                strava_tokens = new_strava_tokens
             #Loop through all activities
             page = 1
             url = "https://www.strava.com/api/v3/activities"
+            print(strava_tokens)
             access_token = strava_tokens['access_token']
             ## Create the dataframe ready for the API call to store your activity data
             activities = pd.DataFrame(
@@ -113,10 +108,8 @@ def strava_summary():
             new_activties = []
             activties = json.loads(activties)
             for activity in activties:
-                print(activity)
-                if activity["id"] not in stored_activties["id"].values:
+                if str(activity["id"]) not in stored_activties["id"].values:
                     new_activties.append([activity['id'],activity['name'],activity['start_date_local'],activity['type'],activity['distance'],activity['moving_time'],activity['elapsed_time'],activity['total_elevation_gain'],activity['end_latlng'],activity['external_id']])
-
             hook.insert_rows(table='runs', rows=new_activties, target_fields=["id", "name", "start_date_local", "type", "distance", "moving_time", "elapsed_time", "total_elevation_gain", "end_latlng", "external_id"])
             return new_activties
 
