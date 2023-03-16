@@ -16,7 +16,7 @@ Please refer to the following python script where I implemented the Airflow pipe
  https://www.youtube.com/watch?v=s-r2gEr7YW4&t=2s&ab_channel=Dataquest
 
 
-These are steps what were implemented in the pipeline: 
+The pipeline has the following steps: 
 
 ### 1. Extracting Data using the Strava API: 
 To extract data using Strava's API I followed the tutorial from this medium article: 
