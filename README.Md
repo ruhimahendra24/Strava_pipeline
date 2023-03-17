@@ -4,10 +4,10 @@
 Strava is an application that you can download on mobile devices and smart watches to track your physical activity. Strava is able to track numerous activities such as running, biking, swimming, walking, skiing and much more. 
 
 ## Purpose of this project 
-As an avid runner, I have been tracking my runs on Strava for just over 3 years now. I came up with this project idea on one of my runs, thinking it would be fascinating to extract my data from Strava and store it on a database. Utilizing this database, I could then analyze my runs and come up with cool insights. 
+As an avid runner, I have been tracking my runs on Strava for just over 3 years now. I came up with this project idea on one of my runs, thinking it would be fascinating to extract my data from Strava and store it on a database. Utilizing this database, I could then analyze my runs and come up with cool insights which could potentially help me become a stronger runner. 
 
 ## Using Apache Airflow to create the pipeline
-I used Apache Airflow to create a data pipeline to extract my acitivities from strava daily and store them on a local database. 
+I used Apache Airflow to create a data pipeline to extract my acitivities from strava daily, and store them on a local database. 
 
 Please refer to the following python script where I implemented the Airflow pipeline:
  https://github.com/ruhimahendra24/Strava_pipeline/blob/master/AIRFLOW/dags/strava_pipeline.py
@@ -36,7 +36,7 @@ I was able to create a final dataframe containing all my strava activities with 
 
 ### 2. Creating the Relational Database:
 
-The second step in this DAG is to create the table that I want to start in the local database using the `SqliteOperator` on Python. 
+The second step in this DAG is to create the table in my local database where I store my runs. This was done by using the `SqliteOperator` on Python. 
 
 Here is the SQL operation I wrote to create the table to store my runs: 
 
