@@ -12,7 +12,7 @@ I used Apache Airflow to create a data pipeline to extract my acitivities from s
 Please refer to the following python script where I implemented the Airflow pipeline:
  https://github.com/ruhimahendra24/Strava_pipeline/blob/master/AIRFLOW/dags/strava_pipeline.py
 
- I followed to following Youtube tutorial to help develop this pipeline: 
+ I followed this Youtube tutorial to help develop this pipeline: 
  https://www.youtube.com/watch?v=s-r2gEr7YW4&t=2s&ab_channel=Dataquest
 
 
